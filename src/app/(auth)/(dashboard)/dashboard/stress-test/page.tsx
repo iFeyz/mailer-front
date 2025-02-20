@@ -56,10 +56,10 @@ export default function StressTestPage() {
       return fetch(`/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
     },
     campaign_lists: async (campaignId: number) => {
-      return fetch(`/api/campaign_lists?campaign_id=${campaignId}`)
+      return fetch(`/api/api/campaign_lists?campaign_id=${campaignId}`)
     },
     campaign_details: async (campaignId: number) => {
-      return fetch(`/api/campaigns/${campaignId}`)
+      return fetch(`/api/api/campaigns/${campaignId}`)
     }
   }
 
