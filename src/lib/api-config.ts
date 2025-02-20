@@ -48,7 +48,7 @@ export const api: MailerApi = {
       if (params.order) searchParams.append('order', params.order)
       if (params.status) searchParams.append('status', params.status)
 
-      const response = await axiosInstance.get(`/campaigns?${searchParams.toString()}`)
+      const response = await axiosInstance.get(`/api/campaigns?${searchParams.toString()}`)
       return response.data
     },
     async getCampaign(id) {
