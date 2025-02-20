@@ -14,10 +14,6 @@ const nextConfig = {
         source: '/api/:path*',
         headers: [
           {
-            key: 'ngrok-skip-browser-warning',
-            value: 'true',
-          },
-          {
             key: 'Accept',
             value: 'application/json',
           },

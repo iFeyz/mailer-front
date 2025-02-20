@@ -21,10 +21,6 @@ const axiosInstance = axios.create({
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'X-API-Key': API_KEY,
-    'ngrok-skip-browser-warning': 'true',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   }
 })
 
@@ -37,10 +33,6 @@ export const api: MailerApi = {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
     'X-API-Key': API_KEY,
-    'ngrok-skip-browser-warning': 'true',
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
   },
 
   // Campaigns API
@@ -54,47 +46,47 @@ export const api: MailerApi = {
       if (params.order) searchParams.append('order', params.order)
       if (params.status) searchParams.append('status', params.status)
 
-      const response = await axiosInstance.get(`/api/campaigns?${searchParams.toString()}`)
+      const response = await axiosInstance.get(`/campaigns?${searchParams.toString()}`)
       return response.data
     },
     async getCampaign(id) {
-      const response = await axiosInstance.get(`/api/campaigns/${id}`)
+      const response = await axiosInstance.get(`/campaigns/${id}`)
       return response.data
     },
     async createCampaign(data) {
-      const response = await axiosInstance.post('/api/campaigns', data)
+      const response = await axiosInstance.post('/campaigns', data)
       return response.data
     },
     async updateCampaign(id, data) {
-      const response = await axiosInstance.put(`/api/campaigns/${id}`, data)
+      const response = await axiosInstance.put(`/campaigns/${id}`, data)
       return response.data
     },
     async deleteCampaign(id) {
-      await axiosInstance.delete(`/api/campaigns/${id}`)
+      await axiosInstance.delete(`/campaigns/${id}`)
     },
     async getCampaignLists(id: number) {
-      const response = await axiosInstance.get('/api/campaign_lists', { 
+      const response = await axiosInstance.get('/campaign_lists', { 
         params: { campaign_id: id }
       })
       return response.data
     },
     async addListToCampaign(campaignId: number, listId: number) {
-      const response = await axiosInstance.post('/api/campaign_lists', {
+      const response = await axiosInstance.post('/campaign_lists', {
         campaign_id: campaignId,
         list_id: listId
       })
       return response.data
     },
     async removeListFromCampaign(campaignId: number, listId: number) {
-      const response = await axiosInstance.delete(`/api/campaign_lists/${campaignId}/${listId}`)
+      const response = await axiosInstance.delete(`/campaign_lists/${campaignId}/${listId}`)
       return response.data
     },
     async getCampaignsByTemplate(templateId) {
-      const response = await axiosInstance.get(`/api/campaigns/by-template/${templateId}`)
+      const response = await axiosInstance.get(`/campaigns/by-template/${templateId}`)
       return response.data
     },
     async updateStatus(id: number, status: CampaignStatus) {
-      const response = await axiosInstance.put(`/api/campaigns/${id}`, { status })
+      const response = await axiosInstance.put(`/campaigns/${id}`, { status })
       return response.data
     },
   },
@@ -102,82 +94,82 @@ export const api: MailerApi = {
   // Lists API
   lists: {
     async getLists(params) {
-      const response = await axiosInstance.get('/api/lists', { params })
+      const response = await axiosInstance.get('/lists', { params })
       return response.data
     },
     async createList(data) {
-      const response = await axiosInstance.post('/api/lists', data)
+      const response = await axiosInstance.post('/lists', data)
       return response.data
     },
     async updateList(id, data) {
-      const response = await axiosInstance.put(`/api/lists/${id}`, data)
+      const response = await axiosInstance.put(`/lists/${id}`, data)
       return response.data
     },
     async deleteList(id) {
-      await axiosInstance.delete(`/api/lists/${id}`)
+      await axiosInstance.delete(`/lists/${id}`)
     }
   },
 
   // Subscribers API
   subscribers: {
     async getSubscribers(params) {
-      const response = await axiosInstance.get('/api/subscribers', { params })
+      const response = await axiosInstance.get('/subscribers', { params })
       return response.data
     },
     async createSubscriber(data) {
-      const response = await axiosInstance.post('/api/subscribers', data)
+      const response = await axiosInstance.post('/subscribers', data)
       return response.data
     },
     async updateSubscriber(id, data) {
-      const response = await axiosInstance.put(`/api/subscribers/${id}`, data)
+      const response = await axiosInstance.put(`/subscribers/${id}`, data)
       return response.data
     },
     async deleteSubscriber(id) {
-      await axiosInstance.delete(`/api/subscribers/${id}`)
+      await axiosInstance.delete(`/subscribers/${id}`)
     }
   },
 
   // Templates API
   templates: {
     async getTemplates(params) {
-      const response = await axiosInstance.get('/api/templates', { params })
+      const response = await axiosInstance.get('/templates', { params })
       return response.data
     },
     async createTemplate(data) {
-      const response = await axiosInstance.post('/api/templates', data)
+      const response = await axiosInstance.post('/templates', data)
       return response.data
     },
     async updateTemplate(id, data) {
-      const response = await axiosInstance.put(`/api/templates/${id}`, data)
+      const response = await axiosInstance.put(`/templates/${id}`, data)
       return response.data
     },
     async deleteTemplate(id) {
-      await axiosInstance.delete(`/api/templates/${id}`)
+      await axiosInstance.delete(`/templates/${id}`)
     }
   },
 
   // Subscriber Lists API
   subscriberLists: {
     async getSubscriberLists(params) {
-      const response = await axiosInstance.get('/api/subscriber_lists/all', { params })
+      const response = await axiosInstance.get('/subscriber_lists/all', { params })
       return response.data
     },
     async getSubscriberList(subscriberId: number, listId: number) {
-      const response = await axiosInstance.get('/api/subscriber_lists', { 
+      const response = await axiosInstance.get('/subscriber_lists', { 
         params: { subscriber_id: subscriberId, list_id: listId }
       })
       return response.data
     },
     async createSubscriberList(data: CreateSubscriberListDto) {
-      const response = await axiosInstance.post('/api/subscriber_lists', data)
+      const response = await axiosInstance.post('/subscriber_lists', data)
       return response.data
     },
     async updateSubscriberList(subscriberId: number, listId: number, data: UpdateSubscriberListDto) {
-      const response = await axiosInstance.put(`/api/subscriber_lists/${subscriberId}/${listId}`, data)
+      const response = await axiosInstance.put(`/subscriber_lists/${subscriberId}/${listId}`, data)
       return response.data
     },
     async deleteSubscriberList(subscriberId: number, listId: number) {
-      const response = await axiosInstance.delete(`/api/subscriber_lists/${subscriberId}/${listId}`)
+      const response = await axiosInstance.delete(`/subscriber_lists/${subscriberId}/${listId}`)
       return response.data
     }
   },
@@ -185,25 +177,25 @@ export const api: MailerApi = {
   // Sequence Emails API
   sequenceEmails: {
     async getAll(params: { campaign_id: number }) {
-      const response = await axiosInstance.get('/api/sequence-emails', { 
+      const response = await axiosInstance.get('/sequence-emails', { 
         params: { campaign_id: params.campaign_id }
       })
       return response.data
     },
     async CREATE(data: CreateSequenceEmailDto) {
-      const response = await axiosInstance.post('/api/sequence-emails', data)
+      const response = await axiosInstance.post('/sequence-emails', data)
       return response.data
     },
     async UPDATE(id: number, data: UpdateSequenceEmailDto) {
-      const response = await axiosInstance.put(`/api/sequence-emails/${id}`, data)
+      const response = await axiosInstance.put(`/sequence-emails/${id}`, data)
       return response.data
     },
     async DELETE(id: number) {
-      const response = await axiosInstance.delete(`/api/sequence-emails/${id}`)
+      const response = await axiosInstance.delete(`/sequence-emails/${id}`)
       return response.data
     },
     async getStats(id: number) {
-      const response = await axiosInstance.get(`/api/sequence-emails/${id}/stats`)
+      const response = await axiosInstance.get(`/sequence-emails/${id}/stats`)
       return response.data
     }
   },
@@ -211,7 +203,7 @@ export const api: MailerApi = {
   // Stats API
   stats: {
     async getGlobalStats() {
-      const response = await axiosInstance.get<GlobalStats>('/api/stats/global')
+      const response = await axiosInstance.get<GlobalStats>('/stats/global')
       return response.data
     }
   }
