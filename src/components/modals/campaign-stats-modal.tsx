@@ -96,7 +96,7 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
   const fetchStats = async () => {
     try {
       setLoading(true)
-      const response = await fetch(`/api/stats/campaign/${campaignId}/detailed`)
+      const response = await fetch(`/api/api/stats/campaign/${campaignId}/detailed`)
       const data = await response.json()
       console.log('Campaign stats:', data)
       setStats(data)
@@ -111,7 +111,7 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
   const fetchSequenceStats = async (sequenceId: number) => {
     try {
       setSequenceLoading(true)
-      const response = await fetch(`/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
+      const response = await fetch(`/api/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
       const data = await response.json()
       setSequenceStats(data)
     } catch (error) {
