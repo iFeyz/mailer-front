@@ -50,10 +50,10 @@ export default function StressTestPage() {
 
   const endpoints = {
     campaign_stats: async (campaignId: number) => {
-      return fetch(`/api/stats/campaign/${campaignId}/detailed`)
+      return fetch(`/api/api/stats/campaign/${campaignId}/detailed`)
     },
     sequence_stats: async (campaignId: number, sequenceId: number) => {
-      return fetch(`/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
+      return fetch(`/api/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
     },
     campaign_lists: async (campaignId: number) => {
       return fetch(`/api/api/campaign_lists?campaign_id=${campaignId}`)
