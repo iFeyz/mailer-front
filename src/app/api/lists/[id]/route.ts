@@ -1,14 +1,16 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = 'http://localhost:8080';
 const API_KEY = 'FSFJDBGJLFEUFNJSJNSQ';
 
-export async function GET(
-  request: Request,
+export const GET = async (
+  req : NextRequest,
+  res : NextResponse,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
-    const response = await fetch(`${API_URL}/lists/${params.id}`, {
+    const id = parseInt(params.id);
+    const response = await fetch(`${API_URL}/lists/${id}`, {
       headers: {
         'X-API-Key': API_KEY
       }
@@ -29,12 +31,13 @@ export async function GET(
   }
 }
 
-export async function PUT(
-  request: Request,
+export const PUT = async (
+  req : NextRequest,
+  res : NextResponse,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
-    const body = await request.json();
+    const body = await req.json();
     const response = await fetch(`${API_URL}/lists/${params.id}`, {
       method: 'PUT',
       headers: {
@@ -59,10 +62,11 @@ export async function PUT(
   }
 }
 
-export async function DELETE(
-  request: Request,
+export const DELETE = async (
+  req : NextRequest,
+  res : NextResponse,
   { params }: { params: { id: string } }
-) {
+) => {
   try {
     const response = await fetch(`${API_URL}/lists/${params.id}`, {
       method: 'DELETE',

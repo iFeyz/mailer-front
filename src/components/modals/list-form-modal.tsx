@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, ReactNode } from "react"
 import { api } from "@/lib/api-config"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -21,44 +21,42 @@ import {
   SelectValue,
 } from "@/components/ui/select"
 import { Plus, Pencil } from "lucide-react"
+import { List, ListType, ListOptin } from "@/lib/api/types"
 
-interface List {
-  id: number;
-  uuid: string;
-  name: string;
-  type: 'Public' | 'Private' | 'Temporary';
-  optin: 'Single' | 'Double';
-  tags: string[];
-  description: string;
-  created_at: string;
-  updated_at: string;
+interface FormData {
+  name: string
+  type: ListType
+  optin: ListOptin
+  tags: string[]
+  description: string
 }
 
 interface ListFormModalProps {
-  list?: List;
-  onSuccess: () => void;
-  mode?: 'create' | 'edit';
+  mode?: "create" | "edit"
+  list?: Partial<List>
+  onSuccess?: () => void
+  children?: ReactNode
 }
 
-export function ListFormModal({ list, onSuccess, mode = 'create' }: ListFormModalProps) {
+export function ListFormModal({ mode = "create", list, onSuccess, children }: ListFormModalProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
-  const [formData, setFormData] = useState({
+  const [formData, setFormData] = useState<FormData>({
     name: "",
-    type: "Public" as const,
-    optin: "Single" as const,
-    tags: [] as string[],
+    type: "Public",
+    optin: "Single",
+    tags: [],
     description: ""
   })
 
   useEffect(() => {
     if (list && mode === 'edit') {
       setFormData({
-        name: list.name,
-        type: list.type,
-        optin: list.optin,
-        tags: list.tags,
-        description: list.description
+        name: list.name || "",
+        type: list.type || "Public",
+        optin: list.optin || "Single",
+        tags: list.tags || [],
+        description: list.description || ""
       })
     }
   }, [list, mode])
@@ -69,19 +67,11 @@ export function ListFormModal({ list, onSuccess, mode = 'create' }: ListFormModa
       setLoading(true)
       if (mode === 'create') {
         await api.lists.createList(formData)
-      } else if (list) {
-        const updateData = {
-          ...formData,
-          uuid: list.uuid
-        }
-        await api.lists.updateList(list.id, {
-            ...formData,
-            id: list.id,
-            uuid: list.uuid
-          })
+      } else if (list?.id) {
+        await api.lists.updateList(list.id, formData)
       }
       setOpen(false)
-      onSuccess()
+      onSuccess?.()
     } catch (error) {
       console.error(`Error ${mode === 'create' ? 'creating' : 'updating'} list:`, error)
     } finally {
@@ -121,7 +111,7 @@ export function ListFormModal({ list, onSuccess, mode = 'create' }: ListFormModa
             <Label htmlFor="type">Type</Label>
             <Select
               value={formData.type}
-              onValueChange={(value: 'Public' | 'Private' | 'Temporary') =>
+              onValueChange={(value: ListType) =>
                 setFormData({ ...formData, type: value })
               }
             >
@@ -139,7 +129,7 @@ export function ListFormModal({ list, onSuccess, mode = 'create' }: ListFormModa
             <Label htmlFor="optin">Opt-in Type</Label>
             <Select
               value={formData.optin}
-              onValueChange={(value: 'Single' | 'Double') =>
+              onValueChange={(value: ListOptin) =>
                 setFormData({ ...formData, optin: value })
               }
             >

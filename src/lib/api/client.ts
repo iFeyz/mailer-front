@@ -1,5 +1,12 @@
 import axios, { AxiosInstance, AxiosRequestConfig } from 'axios';
-import { ApiClientConfig } from './types';
+
+export interface ApiClientConfig {
+  baseURL: string
+  apiKey: string
+  timeout?: number
+  headers?: Record<string, string>
+  withCredentials?: boolean
+}
 
 export class ApiClient {
   protected client: AxiosInstance;

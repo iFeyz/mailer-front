@@ -7,7 +7,6 @@ import {
   CampaignStatus,
   CreateSubscriberListDto,
   UpdateSubscriberListDto,
-  UpdateCampaignListDto
 } from "./api/types"
 import { GlobalStats } from './api/stats'
 
@@ -32,6 +31,11 @@ export const api: MailerApi = {
   apiKey: API_KEY,
   timeout: 10000,
   withCredentials: false,
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': 'application/json',
+    'X-API-Key': API_KEY
+  },
 
   // Campaigns API
   campaigns: {
@@ -87,10 +91,6 @@ export const api: MailerApi = {
       const response = await axiosInstance.put(`/api/campaigns/${id}`, { status })
       return response.data
     },
-    async updateCampaignList(campaignId: number, listId: number, data: UpdateCampaignListDto) {
-      const response = await axiosInstance.put(`/api/campaign_lists/${campaignId}/${listId}`, data)
-      return response.data
-    }
   },
 
   // Lists API
@@ -194,6 +194,10 @@ export const api: MailerApi = {
     },
     async DELETE(id: number) {
       const response = await axiosInstance.delete(`/api/sequence-emails/${id}`)
+      return response.data
+    },
+    async getStats(id: number) {
+      const response = await axiosInstance.get(`/api/sequence-emails/${id}/stats`)
       return response.data
     }
   },

@@ -47,7 +47,7 @@ export interface List {
   optin: ListOptin;
   tags: string[];
   description: string;
-  created_at?: string;
+  created_at: string;
   updated_at?: string;
 }
 
@@ -138,7 +138,7 @@ export interface ApiClientConfig {
 }
 
 export type CampaignStatus = 'Draft' | 'Running' | 'Scheduled' | 'Paused' | 'Cancelled' | 'Finished';
-export type CampaignType = 'Regular' | 'Optin';
+export type CampaignType = "Regular" | "Automated" | "Sequence";
 export type ContentType = 'Richtext' | 'Html' | 'Plain' | 'Markdown';
 
 export interface Campaign {
@@ -146,27 +146,34 @@ export interface Campaign {
   uuid: string;
   name: string;
   subject: string;
+  body: string;
   from_email: string;
-  content_type: ContentType;
-  type: 'Regular' | 'Sequence';
   campaign_type: CampaignType;
   messenger: string;
+  content_type: ContentType;
   template_id?: number;
+  status: CampaignStatus;
+  can_change_status: boolean;
+  sequence_start_date?: string;
+  sequence_end_date?: string;
   to_send: number;
   sent: number;
-  status: CampaignStatus;
   created_at?: string;
   updated_at?: string;
-  can_change_status: boolean;
+  list?: {
+    id: number;
+    name: string;
+  };
 }
 
 export interface CreateCampaignDto {
   name: string;
   subject: string;
+  body: string;
   from_email: string;
-  content_type?: ContentType;
-  campaign_type?: CampaignType;
-  messenger?: string;
+  campaign_type: CampaignType;
+  messenger: string;
+  content_type: ContentType;
   template_id?: number;
   sequence_start_date?: string;
   sequence_end_date?: string;
@@ -175,6 +182,7 @@ export interface CreateCampaignDto {
 export interface UpdateCampaignDto {
   name?: string;
   subject?: string;
+  body?: string;
   from_email?: string;
   content_type?: ContentType;
   status?: CampaignStatus;
@@ -184,6 +192,7 @@ export interface UpdateCampaignDto {
   sequence_start_date?: string;
   sequence_end_date?: string;
   to_send?: number;
+  sent?: number;
 }
 
 export interface CampaignPaginationParams extends PaginationParams {
@@ -234,6 +243,38 @@ export interface UpdateSequenceEmailDto {
   send_at?: string;
 }
 
+export interface PaginatedResponse<T> {
+  items: T[]
+  total: number
+  page: number
+  per_page: number
+  total_pages: number
+}
+
+// Add these interfaces for sequence email stats
+export interface SequenceSubscriber {
+  subscriber_id: number
+  email: string
+  first_open: string
+  open_count: number
+}
+
+export interface SequenceEmailStats {
+  sequence_email_id: number
+  campaign_id: number
+  subject: string
+  position: number
+  status: string
+  sent_at: string
+  total_subscribers: number
+  total_opens: number
+  unique_opens: number
+  open_rate: number
+  opened_subscribers: SequenceSubscriber[]
+  unopened_subscribers: SequenceSubscriber[]
+}
+
+// Update the MailerApi interface to include sequence stats
 export interface MailerApi {
   baseURL: string
   apiKey: string
@@ -241,7 +282,7 @@ export interface MailerApi {
   headers: Record<string, string>
   withCredentials?: boolean
   campaigns: {
-    getCampaigns(params: CampaignPaginationParams): Promise<Campaign[]>
+    getCampaigns(params: CampaignPaginationParams): Promise<PaginatedResponse<Campaign> | Campaign[]>
     getCampaign(id: number): Promise<Campaign>
     createCampaign(data: CreateCampaignDto): Promise<Campaign>
     updateCampaign(id: number, data: UpdateCampaignDto): Promise<Campaign>
@@ -259,7 +300,7 @@ export interface MailerApi {
     deleteList(id: number): Promise<void>
   }
   subscribers: {
-    getSubscribers(params: SubscriberPaginationParams): Promise<Subscriber[]>
+    getSubscribers(params: SubscriberPaginationParams): Promise<PaginatedResponse<Subscriber>>
     createSubscriber(data: CreateSubscriberDto): Promise<Subscriber>
     updateSubscriber(id: number, data: Partial<CreateSubscriberDto>): Promise<Subscriber>
     deleteSubscriber(id: number): Promise<void>
@@ -282,6 +323,7 @@ export interface MailerApi {
     CREATE(data: CreateSequenceEmailDto): Promise<SequenceEmail>
     UPDATE(id: number, data: UpdateSequenceEmailDto): Promise<SequenceEmail>
     DELETE(id: number): Promise<SequenceEmail>
+    getStats(id: number): Promise<SequenceEmailStats>
   }
   stats: {
     getGlobalStats(): Promise<GlobalStats>

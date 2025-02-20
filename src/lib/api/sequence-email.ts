@@ -14,7 +14,7 @@ export class SequenceEmailApi extends ApiClient {
   }
 
   async getAll(params?: PaginationParams & { campaign_id?: number }): Promise<SequenceEmail[]> {
-    const queryString = this.buildQueryString(params)
+    const queryString = this.buildQueryString(params || {})
     return this.get<SequenceEmail[]>(`${this.basePath}${queryString}`)
   }
 

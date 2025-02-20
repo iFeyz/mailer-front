@@ -32,29 +32,7 @@ import { Badge } from "@/components/ui/badge"
 import { toast } from "sonner"
 import { api } from "@/lib/api-config"
 import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/components/ui/collapsible"
-
-interface SequenceEmailStats {
-  sequence_email_id: number
-  campaign_id: number
-  subject: string
-  position: number
-  status: string
-  sent_at: string
-  total_subscribers: number
-  total_opens: number
-  unique_opens: number
-  open_rate: number
-  opened_subscribers: Array<{
-    subscriber_id: number
-    email: string
-    first_open: string
-    open_count: number
-  }>
-  unopened_subscribers: Array<{
-    subscriber_id: number
-    email: string
-  }>
-}
+import { SequenceEmailStats } from "@/lib/api/types"
 
 interface CampaignStats {
   campaign_id: number
@@ -108,7 +86,7 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
   const [stats, setStats] = useState<CampaignStats | null>(null)
   const [loading, setLoading] = useState(false)
   const [selectedSequence, setSelectedSequence] = useState<number | null>(null)
-  const [sequenceStats, setSequenceStats] = useState<SequenceSubscriberStats | null>(null)
+  const [sequenceStats, setSequenceStats] = useState<SequenceEmailStats | null>(null)
   const [page, setPage] = useState(1)
   const PER_PAGE = 10
   const [sequenceLoading, setSequenceLoading] = useState(false)
@@ -220,6 +198,8 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
   }
 
   const getTotalPages = (totalItems: number) => Math.ceil(totalItems / PER_PAGE)
+
+  const getArrayLength = (arr: any[] | undefined | null) => arr?.length || 0
 
   return (
     <Dialog>
@@ -405,7 +385,7 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
                                         <div>
                                           <p className="font-medium">{sub.email}</p>
                                           <p className="text-sm text-muted-foreground">
-                                            First opened: {formatDate(sub.first_open)}
+                                            First opened: {sub.first_open ? formatDate(sub.first_open) : 'Never'}
                                           </p>
                                         </div>
                                         <Badge>{sub.open_count} opens</Badge>
@@ -418,24 +398,24 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
                                   )}
                                 </div>
 
-                                {sequenceStats?.opened_subscribers?.length > 0 && (
+                                {sequenceStats && getArrayLength(sequenceStats.opened_subscribers) > 0 && (
                                   <div className="flex justify-between items-center">
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => setOpenedPage(p => Math.max(1, p - 1))}
-                                      disabled={openedPage === 1}
+                                      disabled={openedPage <= 1}
                                     >
                                       Previous
                                     </Button>
                                     <span className="text-sm text-muted-foreground">
-                                      Page {openedPage} of {getTotalPages(sequenceStats.opened_subscribers.length)}
+                                      Page {openedPage} of {sequenceStats ? getTotalPages(sequenceStats.opened_subscribers.length) : 1}
                                     </span>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => setOpenedPage(p => p + 1)}
-                                      disabled={openedPage >= getTotalPages(sequenceStats.opened_subscribers.length)}
+                                      disabled={!sequenceStats || openedPage >= getTotalPages(sequenceStats.opened_subscribers.length)}
                                     >
                                       Next
                                     </Button>
@@ -496,24 +476,24 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
                                   )}
                                 </div>
 
-                                {sequenceStats?.unopened_subscribers?.length > 0 && (
+                                {sequenceStats && getArrayLength(sequenceStats.unopened_subscribers) > 0 && (
                                   <div className="flex justify-between items-center">
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => setUnOpenedPage(p => Math.max(1, p - 1))}
-                                      disabled={unopenedPage === 1}
+                                      disabled={unopenedPage <= 1}
                                     >
                                       Previous
                                     </Button>
                                     <span className="text-sm text-muted-foreground">
-                                      Page {unopenedPage} of {getTotalPages(sequenceStats.unopened_subscribers.length)}
+                                      Page {unopenedPage} of {sequenceStats ? getTotalPages(sequenceStats.unopened_subscribers.length) : 1}
                                     </span>
                                     <Button
                                       variant="outline"
                                       size="sm"
                                       onClick={() => setUnOpenedPage(p => p + 1)}
-                                      disabled={unopenedPage >= getTotalPages(sequenceStats.unopened_subscribers.length)}
+                                      disabled={!sequenceStats || unopenedPage >= getTotalPages(sequenceStats.unopened_subscribers.length)}
                                     >
                                       Next
                                     </Button>
@@ -705,7 +685,7 @@ export function CampaignStatsModal({ campaignId }: { campaignId: number }) {
                             <div>
                               <p className="font-medium">{sub.email}</p>
                               <p className="text-sm text-muted-foreground">
-                                First opened: {formatDate(sub.first_open)}
+                                First opened: {sub.first_open ? formatDate(sub.first_open) : 'Never'}
                               </p>
                             </div>
                             <Badge>{sub.open_count} opens</Badge>

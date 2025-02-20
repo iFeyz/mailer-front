@@ -32,7 +32,7 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
   }, [value])
 
   // Mise à jour du parent uniquement quand la date ou l'heure change
-  const handleDateChange = React.useCallback((newDate: Date | null) => {
+  const handleDateChange = React.useCallback((newDate: Date | undefined) => {
     if (!newDate) {
       setDate(null)
       onChange?.(null)
@@ -79,9 +79,10 @@ export function DateTimePicker({ value, onChange }: DateTimePickerProps) {
         <PopoverContent className="w-auto p-0" align="start">
           <Calendar
             mode="single"
-            selected={date}
+            selected={date || undefined}
             onSelect={handleDateChange}
             initialFocus
+            required={false}
           />
         </PopoverContent>
       </Popover>

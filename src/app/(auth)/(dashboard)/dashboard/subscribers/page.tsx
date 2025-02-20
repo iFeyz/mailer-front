@@ -39,27 +39,25 @@ export default function SubscribersPage() {
   const PER_PAGE = 10
 
   const fetchSubscribers = useCallback(async () => {
-    setLoading(true)
     try {
+      setLoading(true)
       const params = {
         page: currentPage,
         per_page: PER_PAGE,
-        order_by: sortBy,
-        order: sortOrder,
         query: searchQuery,
-        list_id: selectedList !== "none" ? [parseInt(selectedList)] : undefined,
+        order_by: "created_at",
+        order: "DESC" as const
       }
       const data = await api.subscribers.getSubscribers(params)
-      setSubscribers(Array.isArray(data) ? data : data.items)
-      setHasMore(Array.isArray(data) ? data.length === PER_PAGE : data.items.length === PER_PAGE)
+      setSubscribers(data.items)
+      setHasMore(data.items.length === PER_PAGE)
     } catch (error) {
       console.error("Error fetching subscribers:", error)
       toast.error("Failed to fetch subscribers")
-      setSubscribers([])
-      setHasMore(false)
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
-  }, [currentPage, selectedList, searchQuery, sortBy, sortOrder])
+  }, [currentPage, searchQuery])
 
   const fetchLists = async () => {
     try {

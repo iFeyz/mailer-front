@@ -14,8 +14,9 @@ import { Label } from "@/components/ui/label"
 import { api } from "@/lib/api-config"
 import { toast } from "sonner"
 import { Plus } from "lucide-react"
-import { Subscriber } from "@/lib/api/types"
+import { Subscriber, SubscriberStatus } from "@/lib/api/types"
 import { useForm } from "react-hook-form"
+import { JsonValue } from "type-fest"
 
 interface CreateSubscriberModalProps {
   mode?: "create" | "edit"
@@ -27,26 +28,19 @@ interface CreateSubscriberModalProps {
 interface SubscriberFormData {
   email: string
   name: string
-  status: "Enabled" | "Disabled" | "Blocklisted"
-  attribs?: string
+  status: SubscriberStatus
+  attribs: string
 }
 
-export function CreateSubscriberModal({ 
-  mode = "create",
-  subscriber,
-  onSuccess,
-  children 
-}: CreateSubscriberModalProps) {
+export function CreateSubscriberModal({ mode = "create", subscriber, onSuccess, children }: CreateSubscriberModalProps) {
   const [open, setOpen] = useState(false)
   const [loading, setLoading] = useState(false)
 
   const defaultValues: SubscriberFormData = {
-    email: "",
-    name: "",
-    status: "Enabled",
-    attribs: "{}",
-    ...subscriber,
-    ...(subscriber?.attribs ? { attribs: JSON.stringify(subscriber.attribs) } : {})
+    email: subscriber?.email || "",
+    name: subscriber?.name || "",
+    status: subscriber?.status || "Enabled",
+    attribs: subscriber?.attribs ? JSON.stringify(subscriber.attribs) : "{}"
   }
 
   const form = useForm<SubscriberFormData>({
@@ -56,7 +50,9 @@ export function CreateSubscriberModal({
   useEffect(() => {
     if (mode === "edit" && subscriber) {
       form.reset({
-        ...subscriber,
+        email: subscriber.email,
+        name: subscriber.name || "",
+        status: subscriber.status,
         attribs: JSON.stringify(subscriber.attribs)
       })
     }
@@ -67,14 +63,11 @@ export function CreateSubscriberModal({
       setLoading(true)
       const parsedData = {
         ...data,
-        attribs: JSON.parse(data.attribs || "{}")
+        attribs: JSON.parse(data.attribs)
       }
       
       if (mode === "edit" && subscriber) {
-        await api.subscribers.updateSubscriber(subscriber.email, {
-          ...parsedData,
-          id: subscriber.id
-        })
+        await api.subscribers.updateSubscriber(subscriber.id, parsedData)
         toast.success("Subscriber updated successfully")
       } else {
         await api.subscribers.createSubscriber(parsedData)

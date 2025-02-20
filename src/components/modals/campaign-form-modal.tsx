@@ -39,6 +39,9 @@ interface CampaignFormModalProps {
 }
 
 export function CampaignFormModal({ mode = "create", campaign, onSuccess, children }: CampaignFormModalProps) {
+  const [templates, setTemplates] = useState<Template[]>([])
+  const [loadingTemplates, setLoadingTemplates] = useState(false)
+
   const form = useForm<CreateCampaignDto>({
     defaultValues: {
       name: campaign?.name || "",
@@ -50,11 +53,8 @@ export function CampaignFormModal({ mode = "create", campaign, onSuccess, childr
       sequence_end_date: campaign?.sequence_end_date || undefined,
       template_id: campaign?.template_id,
       content_type: campaign?.content_type || "Html"
-    },
+    }
   })
-
-  const [templates, setTemplates] = useState<Template[]>([])
-  const [loadingTemplates, setLoadingTemplates] = useState(false)
 
   const fetchTemplates = async () => {
     try {
@@ -216,7 +216,6 @@ export function CampaignFormModal({ mode = "create", campaign, onSuccess, childr
                 </FormItem>
               )}
             />
-
 
             <Button type="submit">
               {mode === "edit" ? "Update Campaign" : "Create Campaign"}

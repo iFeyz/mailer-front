@@ -1,12 +1,30 @@
-export * from './types';
-export * from './client';
-export * from './subscribers';
-export * from './lists';
-export * from './templates';
-export * from './subscriber-lists';
-export * from './sequence-email';
+export type {
+  PaginationParams,
+  Subscriber,
+  SubscriberStatus,
+  List,
+  ListType,
+  ListOptin,
+  Template,
+  TemplateType,
+  SubscriberList,
+  SubscriptionStatus,
+  Campaign,
+  CampaignStatus,
+  CampaignType,
+  ContentType,
+  SequenceEmail,
+} from './types'
 
-import { ApiClientConfig } from './client';
+export { ApiClient } from './client'
+
+export * from './subscribers'
+export * from './lists'
+export * from './templates'
+export * from './subscriber-lists'
+export * from './sequence-email'
+
+import { ApiClientConfig } from './types';
 import { SubscribersApi } from './subscribers';
 import { ListsApi } from './lists';
 import { TemplatesApi } from './templates';
