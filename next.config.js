@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'https://67e6-185-63-50-103.ngrok-free.app/:path*',
+        destination: 'http://13.39.119.23:8080/:path*',
       },
     ]
   },
@@ -16,6 +16,14 @@ const nextConfig = {
           {
             key: 'ngrok-skip-browser-warning',
             value: 'true',
+          },
+          {
+            key: 'Accept',
+            value: 'application/json',
+          },
+          {
+            key: 'Content-Type',
+            value: 'application/json',
           },
         ],
       },
