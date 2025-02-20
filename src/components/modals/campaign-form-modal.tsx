@@ -217,6 +217,71 @@ export function CampaignFormModal({ mode = "create", campaign, onSuccess, childr
               )}
             />
 
+            <FormField
+              control={form.control}
+              name="campaign_type"
+              rules={{ required: "Campaign type is required" }}
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Campaign Type</FormLabel>
+                  <Select
+                    value={field.value}
+                    onValueChange={field.onChange}
+                  >
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue placeholder="Select campaign type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="Regular">Regular</SelectItem>
+                      <SelectItem value="Automated">Automated</SelectItem>
+                      <SelectItem value="Sequence">Sequence</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            {form.watch("campaign_type") === "Sequence" && (
+              <>
+                <FormField
+                  control={form.control}
+                  name="sequence_start_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sequence Start Date</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date?.toISOString())}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="sequence_end_date"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Sequence End Date</FormLabel>
+                      <FormControl>
+                        <DateTimePicker
+                          value={field.value ? new Date(field.value) : undefined}
+                          onChange={(date) => field.onChange(date?.toISOString())}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              </>
+            )}
+
             <Button type="submit">
               {mode === "edit" ? "Update Campaign" : "Create Campaign"}
             </Button>

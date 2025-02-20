@@ -10,9 +10,7 @@ import {
 } from "./api/types"
 import { GlobalStats } from './api/stats'
 
-const baseURL = process.env.NODE_ENV === 'development' 
-  ? '' // Empty string will use the current host
-  : process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8080'
+const baseURL = '/api'
 
 const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'FSFJDBGJLFEUFNJSJNSQ'
 
@@ -48,7 +46,7 @@ export const api: MailerApi = {
       if (params.order) searchParams.append('order', params.order)
       if (params.status) searchParams.append('status', params.status)
 
-      const response = await axiosInstance.get(`/api/campaigns?${searchParams.toString()}`)
+      const response = await axiosInstance.get(`/campaigns?${searchParams.toString()}`)
       return response.data
     },
     async getCampaign(id) {

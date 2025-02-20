@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 
-const API_URL = 'http://localhost:8080';
+const API_URL = '';
 const API_KEY = 'FSFJDBGJLFEUFNJSJNSQ';
 
 export const GET = async (

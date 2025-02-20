@@ -137,7 +137,7 @@ export interface ApiClientConfig {
   withCredentials?: boolean;
 }
 
-export type CampaignStatus = 'Draft' | 'Running' | 'Scheduled' | 'Paused' | 'Cancelled' | 'Finished';
+export type CampaignStatus = 'Draft' | 'Running' | 'Finished' | 'Cancelled';
 export type CampaignType = "Regular" | "Automated" | "Sequence";
 export type ContentType = 'Richtext' | 'Html' | 'Plain' | 'Markdown';
 

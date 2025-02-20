@@ -16,10 +16,23 @@ import { Badge } from "@/components/ui/badge"
 import { formatDate } from "@/lib/utils"
 import { CampaignFormModal } from "@/components/modals/campaign-form-modal"
 import { CampaignStatsModal } from "@/components/modals/campaign-stats-modal"
-import { Trash2, PlayCircle, PauseCircle } from "lucide-react"
+import { Trash2, PlayCircle, PauseCircle, Clock, PenSquare, BarChart2 } from "lucide-react"
 import { SearchBar } from "@/components/search-bar"
 import { toast } from "sonner"
-import { Campaign } from "@/lib/api/types"
+import { Campaign, CampaignStatus } from "@/lib/api/types"
+import Link from "next/link"
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 export function CampaignsContent() {
   const searchParams = useSearchParams()
@@ -78,8 +91,19 @@ export function CampaignsContent() {
 
   const handleToggleStatus = async (campaign: Campaign) => {
     try {
-      const newStatus = campaign.status === "Running" ? "Paused" : "Running"
+      const newStatus = campaign.status === "Running" ? "Finished" : "Running"
       await api.campaigns.updateCampaign(campaign.id, { status: newStatus })
+      toast.success(`Campaign ${newStatus.toLowerCase()} successfully`)
+      fetchCampaigns()
+    } catch (error) {
+      console.error("Error updating campaign status:", error)
+      toast.error("Failed to update campaign status")
+    }
+  }
+
+  const handleStatusChange = async (id: number, newStatus: CampaignStatus) => {
+    try {
+      await api.campaigns.updateCampaign(id, { status: newStatus })
       toast.success(`Campaign ${newStatus.toLowerCase()} successfully`)
       fetchCampaigns()
     } catch (error) {
@@ -136,32 +160,51 @@ export function CampaignsContent() {
                       </Badge>
                     </TableCell>
                     <TableCell>
-                      <Badge variant={
-                        campaign.status === "Running" ? "default" :
-                        campaign.status === "Paused" ? "secondary" :
-                        campaign.status === "Draft" ? "outline" :
-                        "destructive"
-                      }>
-                        {campaign.status}
-                      </Badge>
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            className="h-8 space-x-2 border"
+                          >
+                            <Badge 
+                              variant={
+                                campaign.status === 'Running' ? 'default' :
+                                campaign.status === 'Draft' ? 'secondary' :
+                                campaign.status === 'Cancelled' ? 'destructive' :
+                                'outline'
+                              }
+                            >
+                              {campaign.status}
+                            </Badge>
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem onClick={() => handleStatusChange(campaign.id, 'Draft')}>
+                            Set as Draft
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusChange(campaign.id, 'Running')}>
+                            Set as Running
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusChange(campaign.id, 'Finished')}>
+                            Set as Finished
+                          </DropdownMenuItem>
+                          <DropdownMenuItem onClick={() => handleStatusChange(campaign.id, 'Cancelled')}>
+                            Set as Cancelled
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
                     </TableCell>
                     <TableCell>{campaign.created_at ? formatDate(campaign.created_at) : 'N/A'}</TableCell>
                     <TableCell>
                       <div className="flex items-center gap-2">
-                        <CampaignStatsModal campaignId={campaign.id} />
                         <CampaignFormModal mode="edit" campaign={campaign} onSuccess={fetchCampaigns} />
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          onClick={() => handleToggleStatus(campaign)}
-                          disabled={campaign.status === "Draft" || campaign.status === "Finished"}
-                        >
-                          {campaign.status === "Running" ? (
-                            <PauseCircle className="h-4 w-4" />
-                          ) : (
-                            <PlayCircle className="h-4 w-4" />
-                          )}
-                        </Button>
+                        <Link href={`/dashboard/campaigns/${campaign.id}/sequence`}>
+                          <Button variant="ghost" size="icon">
+                            <Clock className="h-4 w-4" />
+                          </Button>
+                        </Link>
+                        <CampaignStatsModal campaignId={campaign.id} />
                         <Button
                           variant="ghost"
                           size="icon"
