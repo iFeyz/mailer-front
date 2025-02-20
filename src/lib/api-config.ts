@@ -20,7 +20,8 @@ const axiosInstance = axios.create({
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'X-API-Key': API_KEY
+    'X-API-Key': API_KEY,
+    'ngrok-skip-browser-warning': 'true'
   }
 })
 
@@ -32,7 +33,8 @@ export const api: MailerApi = {
   headers: {
     'Content-Type': 'application/json',
     'Accept': 'application/json',
-    'X-API-Key': API_KEY
+    'X-API-Key': API_KEY,
+    'ngrok-skip-browser-warning': 'true'
   },
 
   // Campaigns API
