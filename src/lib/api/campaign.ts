@@ -1,5 +1,5 @@
 import { ApiClient } from "./client"
-import { Campaign, CreateCampaignDto, UpdateCampaignDto, CampaignPaginationParams, CampaignList, SubscriberList, Subscriber } from "./types"
+import { Campaign, CreateCampaignDto, UpdateCampaignDto, CampaignPaginationParams, CampaignList, SubscriberList, Subscriber, CampaignStats, SequenceEmailStats } from "./types"
 
 export class CampaignApi extends ApiClient {
     private readonly basePath = "/api/campaigns"
@@ -10,8 +10,6 @@ export class CampaignApi extends ApiClient {
     async createCampaign(data: CreateCampaignDto): Promise<Campaign> {
         return this.post<Campaign>(this.basePath, data)
     }
-
-
 
     async getCampaigns(params: CampaignPaginationParams = {}): Promise<Campaign[]> {
         const queryString = this.buildQueryString(params)
@@ -52,14 +50,12 @@ export class CampaignApi extends ApiClient {
     }
 
     async sendCampaign(campaign: Campaign): Promise<void> {
-        // First, get all lists associated with this campaign
         const campaignLists = await this.getCampaignLists(campaign.id)
         
         if (campaignLists.length === 0) {
             throw new Error("No lists associated with this campaign")
         }
 
-        // Get all subscribers from these lists
         const subscriberListsPromises = campaignLists.map(list => 
             this.get<SubscriberList[]>(
                 `/api/subscriber_lists/all?list_id=${list.list_id}&status=Confirmed`
@@ -69,40 +65,42 @@ export class CampaignApi extends ApiClient {
         const subscriberListsResults = await Promise.all(subscriberListsPromises)
         const subscriberLists = subscriberListsResults.flat()
 
-        // Get the actual subscriber details
         const subscriberPromises = subscriberLists.map(sl => 
             this.get<Subscriber>(`/api/subscribers/${sl.subscriber_id}`)
         )
         
         const subscribers = await Promise.all(subscriberPromises)
         
-        // Remove duplicates in case a subscriber is in multiple lists
         const uniqueSubscribers = [...new Map(subscribers.map(s => [s.email, s])).values()]
 
         if (uniqueSubscribers.length === 0) {
             throw new Error("No confirmed subscribers found in the selected lists")
         }
         
-        // Prepare emails array
         const emails = uniqueSubscribers.map(subscriber => ({
             to: subscriber.email,
             subject: campaign.subject,
             content: campaign.body,
             campaign_id: campaign.id.toString(),
             metadata: {
-
                 template_id: campaign.template_id?.toString() || "",
                 subscriber_id: subscriber.id.toString()
             }
         }))
 
-        // Send all emails using the bulk endpoint
         const response = await this.post<{ sent: number }>(this.sendBulkEmailPath, emails)
         
-        // Update campaign with number of emails sent
         await this.updateCampaign(campaign.id, {
             sent: campaign.sent + response.sent,
             status: 'Running'
         })
+    }
+
+    async getCampaignStats(campaignId: number): Promise<CampaignStats> {
+        return this.get<CampaignStats>(`/api/stats/campaign/${campaignId}/detailed`)
+    }
+
+    async getSequenceStats(campaignId: number, sequenceId: number): Promise<SequenceEmailStats> {
+        return this.get<SequenceEmailStats>(`/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
     }
 }

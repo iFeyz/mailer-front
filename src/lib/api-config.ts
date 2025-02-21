@@ -90,6 +90,14 @@ export const api: MailerApi = {
       const response = await axiosInstance.put(`/api/campaigns/${id}`, { status })
       return response.data
     },
+    async getCampaignStats(campaignId: number) {
+      const response = await axiosInstance.get(`/api/stats/campaign/${campaignId}/detailed`)
+      return response.data
+    },
+    async getSequenceStats(campaignId: number, sequenceId: number) {
+      const response = await axiosInstance.get(`/api/stats/campaign/${campaignId}/sequence/${sequenceId}`)
+      return response.data
+    },
   },
 
   // Lists API

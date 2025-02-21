@@ -255,18 +255,18 @@ export interface PaginatedResponse<T> {
 export interface SequenceSubscriber {
   subscriber_id: number
   email: string
-  first_open: string
-  open_count: number
+  first_open?: string
+  open_count?: number
 }
 
 export interface SequenceEmailStats {
+  sequence_id: number
   sequence_email_id: number
-  campaign_id: number
   subject: string
-  position: number
   status: string
   sent_at: string
-  total_subscribers: number
+  position: number
+  total_sent: number
   total_opens: number
   unique_opens: number
   open_rate: number
@@ -292,6 +292,8 @@ export interface MailerApi {
     removeListFromCampaign(campaignId: number, listId: number): Promise<void>
     getCampaignsByTemplate(templateId: number): Promise<Campaign[]>
     updateStatus(id: number, status: CampaignStatus): Promise<Campaign>
+    getCampaignStats(campaignId: number): Promise<CampaignStats>
+    getSequenceStats(campaignId: number, sequenceId: number): Promise<SequenceEmailStats>
   }
   lists: {
     getLists(params: ListPaginationParams): Promise<List[]>
@@ -328,4 +330,48 @@ export interface MailerApi {
   stats: {
     getGlobalStats(): Promise<GlobalStats>
   }
+}
+
+export interface CampaignStats {
+  campaign_id: number
+  campaign_name: string
+  status: string
+  start_date: string | null
+  total_subscribers: number
+  total_sent: number
+  total_opens: number
+  unique_opens: number
+  open_rate: number
+  unopened_count: number
+  total_sequence_emails: number
+  sequence_stats: SequenceEmailStats[]
+  country_stats: Array<{ country: string; opens: number }>
+  city_stats: Array<{ city: string; opens: number }>
+  opens_by_hour: Array<{ hour: number; opens: number }>
+  opens_by_day: Array<{ date: string; opens: number }>
+  opened_subscribers: Array<{
+    subscriber_id: number
+    email: string
+    first_open: string
+    open_count: number
+  }>
+  unopened_subscribers: Array<{
+    subscriber_id: number
+    email: string
+  }>
+}
+
+export interface SequenceEmailStats {
+  sequence_id: number
+  sequence_email_id: number
+  subject: string
+  status: string
+  sent_at: string
+  position: number
+  total_sent: number
+  total_opens: number
+  unique_opens: number
+  open_rate: number
+  opened_subscribers: SequenceSubscriber[]
+  unopened_subscribers: SequenceSubscriber[]
 }
