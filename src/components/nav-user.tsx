@@ -23,7 +23,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { signOut } from "../../utils/auth-client"
 
 export function NavUser({
   user,
@@ -73,7 +72,6 @@ export function NavUser({
         <DropdownMenuSeparator />
         <DropdownMenuItem
           onClick={() => {
-            signOut()
             router.push('/')
           }}
         >

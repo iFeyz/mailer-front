@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { CreateSubscriberModal } from "@/components/modals/create-subscriber-modal"
 import { ImportSubscribersModal } from "@/components/modals/import-subscribers-modal"
 import { formatDate } from "@/lib/utils"
-import { Subscriber, List } from "@/lib/api/types"
+import { Subscriber, List, SubscriberPaginationParams } from "@/lib/api/types"
 import {
   Select,
   SelectContent,
@@ -25,14 +25,15 @@ import {
 } from "lucide-react"
 import { SubscriberListsModal } from "@/components/modals/subscriber-lists-modal"
 import { Input } from "@/components/ui/input"
+import { useSearchParams } from "next/navigation"
 
 export default function SubscribersPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
   const [loading, setLoading] = useState(true)
   const [lists, setLists] = useState<List[]>([])
-  const [selectedList, setSelectedList] = useState<string>("none")
+  const [selectedList, setSelectedList] = useState("none")
   const [currentPage, setCurrentPage] = useState(1)
-  const [hasMore, setHasMore] = useState(true)
+  const [hasMore, setHasMore] = useState(false)
   const [searchInput, setSearchInput] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("created_at")
@@ -42,22 +43,24 @@ export default function SubscribersPage() {
   const fetchSubscribers = useCallback(async () => {
     try {
       setLoading(true)
-      const params = {
+      const params: SubscriberPaginationParams = {
         page: currentPage,
         per_page: PER_PAGE,
         query: searchQuery,
-        list_id: selectedList !== "none" ? parseInt(selectedList) : undefined,
+        list_id: selectedList !== "none" ? [parseInt(selectedList)] : undefined,
         order_by: sortBy,
         order: sortOrder
       }
-      const data = await api.subscribers.getSubscribers(params)
       
-      if (searchQuery && !Array.isArray(data)) {
-        setSubscribers([data])
+      const response = await api.subscribers.getSubscribers(params)
+      
+      if (searchQuery && !Array.isArray(response)) {
+        setSubscribers([response as unknown as Subscriber])
         setHasMore(false)
       } else {
-        setSubscribers(Array.isArray(data) ? data : data.items || [])
-        setHasMore(!searchQuery && (data.items?.length === PER_PAGE))
+        const items = Array.isArray(response) ? response : response.items || []
+        setSubscribers(items)
+        setHasMore(items.length === PER_PAGE)
       }
     } catch (error) {
       console.error("Error fetching subscribers:", error)
@@ -110,6 +113,15 @@ export default function SubscribersPage() {
     setSortBy("created_at")
     setSortOrder("DESC")
     setCurrentPage(1)
+  }
+
+  const handleSort = (field: string) => {
+    if (sortBy === field) {
+      setSortOrder(sortOrder === "ASC" ? "DESC" : "ASC")
+    } else {
+      setSortBy(field)
+      setSortOrder("DESC")
+    }
   }
 
   return (

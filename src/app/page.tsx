@@ -1,26 +1,28 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import { toast } from "sonner"
 
-const CORRECT_PASSWORD = "votre-mot-de-passe-ici" // À définir dans une variable d'environnement en production
-
 export default function AuthPage() {
   const [password, setPassword] = useState("")
   const [loading, setLoading] = useState(false)
+  const [mounted, setMounted] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
 
     try {
-      if (password === CORRECT_PASSWORD) {
-        // Stocker l'authentification dans un cookie
+      if (password === process.env.NEXT_PUBLIC_AUTH_PASSWORD) {
         document.cookie = "authenticated=true; path=/"
         router.push("/dashboard")
       } else {
@@ -32,6 +34,10 @@ export default function AuthPage() {
     } finally {
       setLoading(false)
     }
+  }
+
+  if (!mounted) {
+    return null
   }
 
   return (

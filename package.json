@@ -27,7 +27,6 @@
     "@react-email/components": "^0.0.32",
     "@usewaypoint/email-builder": "^0.0.8",
     "axios": "^1.7.9",
-    "better-auth": "^1.1.11",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
