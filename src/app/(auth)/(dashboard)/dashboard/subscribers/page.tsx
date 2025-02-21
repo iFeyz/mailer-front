@@ -25,7 +25,6 @@ import {
 } from "lucide-react"
 import { SubscriberListsModal } from "@/components/modals/subscriber-lists-modal"
 import { Input } from "@/components/ui/input"
-import { useSearchParams } from "next/navigation"
 
 export default function SubscribersPage() {
   const [subscribers, setSubscribers] = useState<Subscriber[]>([])
