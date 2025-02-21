@@ -114,8 +114,13 @@ export const api: MailerApi = {
   // Subscribers API
   subscribers: {
     async getSubscribers(params) {
-      const response = await axiosInstance.get('/api/subscribers', { params })
-      return response.data
+      if (params.query) {
+        const response = await axiosInstance.get(`/api/subscribers/${encodeURIComponent(params.query)}`)
+        return response.data
+      } else {
+        const response = await axiosInstance.get('/api/subscribers', { params })
+        return response.data
+      }
     },
     async createSubscriber(data) {
       const response = await axiosInstance.post('/api/subscribers', data)

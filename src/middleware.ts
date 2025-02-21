@@ -8,6 +8,19 @@ const allowedOrigins = [
 ];
 
 export function middleware(request: NextRequest) {
+  const isAuthenticated = request.cookies.get('authenticated');
+  const isAuthPage = request.nextUrl.pathname === '/';
+  
+  // Si l'utilisateur n'est pas authentifié et n'est pas sur la page d'auth
+  if (!isAuthenticated && !isAuthPage) {
+    return NextResponse.redirect(new URL('/', request.url));
+  }
+
+  // Si l'utilisateur est authentifié et sur la page d'auth
+  if (isAuthenticated && isAuthPage) {
+    return NextResponse.redirect(new URL('/dashboard', request.url));
+  }
+
   // Get the origin from the request headers
   const origin = request.headers.get('origin');
   
@@ -34,5 +47,5 @@ export function middleware(request: NextRequest) {
 
 // Configure which paths should be processed by this middleware
 export const config = {
-  matcher: '/api/:path*',
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico).*)']
 }; 

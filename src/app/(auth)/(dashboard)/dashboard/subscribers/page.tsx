@@ -33,6 +33,7 @@ export default function SubscribersPage() {
   const [selectedList, setSelectedList] = useState<string>("none")
   const [currentPage, setCurrentPage] = useState(1)
   const [hasMore, setHasMore] = useState(true)
+  const [searchInput, setSearchInput] = useState("")
   const [searchQuery, setSearchQuery] = useState("")
   const [sortBy, setSortBy] = useState("created_at")
   const [sortOrder, setSortOrder] = useState<"ASC" | "DESC">("DESC")
@@ -45,19 +46,28 @@ export default function SubscribersPage() {
         page: currentPage,
         per_page: PER_PAGE,
         query: searchQuery,
-        order_by: "created_at",
-        order: "DESC" as const
+        list_id: selectedList !== "none" ? parseInt(selectedList) : undefined,
+        order_by: sortBy,
+        order: sortOrder
       }
       const data = await api.subscribers.getSubscribers(params)
-      setSubscribers(data.items)
-      setHasMore(data.items.length === PER_PAGE)
+      
+      if (searchQuery && !Array.isArray(data)) {
+        setSubscribers([data])
+        setHasMore(false)
+      } else {
+        setSubscribers(Array.isArray(data) ? data : data.items || [])
+        setHasMore(!searchQuery && (data.items?.length === PER_PAGE))
+      }
     } catch (error) {
       console.error("Error fetching subscribers:", error)
       toast.error("Failed to fetch subscribers")
+      setSubscribers([])
+      setHasMore(false)
     } finally {
       setLoading(false)
     }
-  }, [currentPage, searchQuery])
+  }, [currentPage, searchQuery, selectedList, sortBy, sortOrder])
 
   const fetchLists = async () => {
     try {
@@ -88,13 +98,18 @@ export default function SubscribersPage() {
     }
   }
 
-  const handleSort = (column: string) => {
-    if (sortBy === column) {
-      setSortOrder(sortOrder === "ASC" ? "DESC" : "ASC")
-    } else {
-      setSortBy(column)
-      setSortOrder("ASC")
-    }
+  const handleSearch = () => {
+    setSearchQuery(searchInput)
+    setCurrentPage(1)
+  }
+
+  const resetFilters = () => {
+    setSearchInput("")
+    setSearchQuery("")
+    setSelectedList("none")
+    setSortBy("created_at")
+    setSortOrder("DESC")
+    setCurrentPage(1)
   }
 
   return (
@@ -108,15 +123,26 @@ export default function SubscribersPage() {
       </div>
 
       <div className="flex items-center gap-4">
-        <Input
-          placeholder="Search by email or name..."
-          value={searchQuery}
-          onChange={(e) => {
-            setSearchQuery(e.target.value)
-            setCurrentPage(1)
-          }}
-          className="max-w-sm"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search by email..."
+            value={searchInput}
+            onChange={(e) => setSearchInput(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                handleSearch()
+              }
+            }}
+            className="max-w-sm"
+          />
+          <Button 
+            onClick={handleSearch}
+            variant="secondary"
+          >
+            Search
+          </Button>
+        </div>
+
         <Select
           value={selectedList}
           onValueChange={(value) => {
@@ -136,6 +162,37 @@ export default function SubscribersPage() {
             ))}
           </SelectContent>
         </Select>
+
+        <Select
+          value={sortBy}
+          onValueChange={(value) => {
+            setSortBy(value)
+            setCurrentPage(1)
+          }}
+        >
+          <SelectTrigger className="w-[200px]">
+            <SelectValue placeholder="Sort by" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="created_at">Date Added</SelectItem>
+            <SelectItem value="email">Email</SelectItem>
+            <SelectItem value="name">Name</SelectItem>
+          </SelectContent>
+        </Select>
+
+        <Button
+          variant="outline"
+          onClick={() => setSortOrder(sortOrder === "ASC" ? "DESC" : "ASC")}
+        >
+          {sortOrder === "ASC" ? "↑" : "↓"}
+        </Button>
+
+        <Button
+          variant="outline"
+          onClick={resetFilters}
+        >
+          Reset Filters
+        </Button>
       </div>
 
       {loading ? (
