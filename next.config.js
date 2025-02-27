@@ -4,7 +4,7 @@ const nextConfig = {
     return [
       {
         source: '/api/:path*',
-        destination: 'http://13.39.119.23:8080/:path*',
+        destination: 'https://mail.app.wayfe.net/:path*',
       },
     ]
   },
