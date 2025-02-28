@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 
 const API_URL = '';
-const API_KEY = 'FSFJDBGJLFEUFNJSJNSQ';
+const API_KEY = 'OlH2V4j/OMfBnxfUvsrjoiD9xcI+/ihMv1go8/hf2HI=';
 
 export const GET = async (
   req : NextRequest,

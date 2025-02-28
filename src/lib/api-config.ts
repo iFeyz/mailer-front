@@ -12,7 +12,7 @@ import { GlobalStats } from './api/stats'
 
 const baseURL = '/api'
 
-const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'FSFJDBGJLFEUFNJSJNSQ'
+const API_KEY = process.env.NEXT_PUBLIC_API_KEY || 'OlH2V4j/OMfBnxfUvsrjoiD9xcI+/ihMv1go8/hf2HI='
 
 // Create axios instance with default config
 const axiosInstance = axios.create({
